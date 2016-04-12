@@ -1,0 +1,208 @@
+#include <iostream>
+
+using namespace std;
+
+struct LinkNode
+{
+    int data;
+    LinkNode *next;
+    LinkNode()
+    {
+        next=NULL;
+    }
+    LinkNode(int item)
+    {
+        data=item;
+        next=NULL;
+    }
+    LinkNode(int item,LinkNode *p)
+    {
+        data=item;
+        next=p;
+    }
+};
+
+class List
+{
+private:
+    LinkNode *first;
+public:
+    List()
+    {
+        first=new LinkNode();
+    }
+    List(LinkNode *p)
+    {
+        first=p;
+    }
+    ~List()
+    {
+        makeEmpty();   //
+    }
+    void makeEmpty();        //
+    LinkNode* Search(int item);            //
+    bool Insert(int i,int a);         //
+    bool Remove(int i);             //
+    void Sort();                   //   冒泡
+    int Length();         //
+    void output();             //
+    void Input(int i);       //
+    void Reverse();
+};
+
+void List::makeEmpty()
+{
+    LinkNode* p;
+    while(first->next!=NULL)
+    {
+        p=first->next;
+        first->next=p->next;
+        delete p;
+    }
+}
+
+LinkNode* List::Search(int item)
+{
+    if(first->next==NULL)
+        return NULL;
+    while(first->next!=NULL)
+    {
+        if(first->next->data==item)
+        {
+            return first->next;
+        }
+        first=first->next;
+    }
+    return NULL;
+}
+
+bool List::Insert(int i,int a)
+{
+    int con=0;
+    LinkNode *p=first;
+    if(p->next==NULL)
+        return false;
+    while(con!=i)
+    {
+        if(p->next==NULL)
+        {
+            return false;
+        }
+        p=p->next;
+        con++;
+    }
+    LinkNode *pp=new LinkNode(a,p->next);
+    p->next=pp;
+    return true;
+}
+
+bool List::Remove(int a)
+{
+    int con=0;
+    LinkNode *p=first;
+    if(p->next==NULL)
+        return false;
+    while(con!=a)
+    {
+        if(p->next==NULL)
+        {
+            return false;
+        }
+        p=p->next;
+        con++;
+    }
+    LinkNode *pp=p->next;
+    p->next=p->next->next;
+    delete pp;
+    return true;
+}
+
+int List::Length()
+{
+    int con=0;
+    LinkNode *p=first;
+    while(p->next!=NULL)
+    {
+        con++;
+        p=p->next;
+    }
+    return con;
+}
+
+void List::Sort()
+{
+    int length=Length();
+    for(int i=0; i<length; i++)
+    {
+        LinkNode *p1=first->next;
+        LinkNode *p2=p1->next;
+        for(int j=1; j<length; j++)
+        {
+            if(p1->data>p2->data)
+            {
+                int tem=p1->data;
+                p1->data=p2->data;
+                p2->data=tem;
+            }
+            p1=p1->next;
+            p2=p2->next;
+        }
+    }
+}
+
+void List::output()
+{
+    LinkNode *p=first->next;
+    while(p!=NULL)
+    {
+        cout<<p->data<<endl;
+        p=p->next;
+    }
+    return;
+}
+
+void List::Input(int i)
+{
+    int Con=1;
+    int item;
+    cin>>item;
+    LinkNode *p=new LinkNode(item);
+    first->next=p;
+    while(Con!=i)
+    {
+        cin>>item;
+        LinkNode *pp=new LinkNode(item);
+        p->next=pp;
+        p=pp;
+        Con++;
+    }
+}
+
+void List::Reverse()
+{
+    LinkNode *p=first;
+    LinkNode *pp=p->next;
+    p=pp->next;
+    pp->next=NULL;
+    while(p!=NULL)
+    {
+        first->next=p;
+        p=p->next;
+        first->next->next=pp;
+        pp=first->next;
+    }
+}
+
+int main()
+{
+    List a;
+    cout<<"请确定链表长度"<<endl;
+    int length;
+    cin>>length;
+    a.Input(length);
+    a.Sort();
+    a.output();
+    a.Reverse();     //倒置,仅通过改变连接
+    a.output();
+    return 0;
+}
