@@ -1,0 +1,150 @@
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <functional>
+#include <algorithm>
+#include <iterator>
+
+using namespace std;
+
+template<class T>
+class MyMatrix
+{
+public:
+	vector<vector<T> >matrix;
+public:
+	MyMatrix(int m,int n) : matrix(m,vector<T>(n))
+	{
+	}
+
+	MyMatrix(string s,int m,int n):matrix(m,vector<T>(n))
+	{
+		istringstream out(s);
+		char ch;
+		for(int i = 0 ; i < m ;i ++)
+		{
+			for(int j = 0 ; j < n ; j ++)
+			{
+				out >> matrix[i][j] ;
+			}
+			out >> ch;
+		}
+	}
+
+	int GetMatrixRows()
+	{
+		return matrix.size();
+	}
+
+	int GetMatrixCols()
+	{
+		return matrix[0].size();
+	}
+
+	MyMatrix<T> Add(MyMatrix<T> &m)
+	{
+		int row = GetMatrixRows();
+		int col = GetMatrixCols();
+		int row2 = m.GetMatrixRows();
+		int col2 = m.GetMatrixCols();
+		if(row != row2 || col != col2)
+			return MyMatrix<T> (0,0);
+
+		MyMatrix<T> tmp(row,col);
+		for(int i = 0 ; i < row ;i ++)
+		{
+			transform(matrix[i].begin(),matrix[i].end(),m.maxtrix[i].begin(),tmp.maxtrix[i].begin(),
+				plus<T>());
+		}
+
+		return tmp;
+	}
+
+	MyMatrix<T> Minux(MyMatrix<T> &m)
+	{
+		int row = GetMatrixRows();
+		int col = GetMatrixCols();
+		int row2 = m.GetMatrixRows();
+		int col2 = m.GetMatrixCols();
+		if(row != row2 || col != col2)
+			return MyMatrix<T>(0,0);
+
+		MyMatrix<T> tmp(row,col);
+		for(int i = 0 ; i < row ;i ++)
+		{
+			transform(matrix[i].begin(),matrix[i].end(),m.matrix[i].begin(),tmp.matrix[i].begin(),
+				minus<T>());
+				//transform(first1,last1,first2,result,binary_op);first1是第一个容器的首迭代器，last1为第一个容器的末迭代器，first2为第二个容器的首迭代器，result为存放结果的容器，binary_op为要进行操作的二元函数对象或sturct、class。
+		}
+
+		return tmp;
+	}
+
+	MyMatrix<T> Multiply(MyMatrix<T> &m)
+	{
+		int row = GetMatrixRows();
+		int col = GetMatrixCols();
+		int row2 = m.GetMatrixRows();
+		int col2 = m.GetMatrixCols();
+		if(col != row2)
+			return MyMatrix(0,0);
+
+		MyMatrix<T> tmp(row,col2);
+		for(int i = 0 ; i < row ;i ++)
+		{
+			for(int j = 0 ; j < col2; j ++)
+			{
+				tmp.matrix[i][j] = 0;
+				for(int k = 0 ;k < col; k ++)
+					tmp.matrix[i][j] += matrix[i][k] * m.matrix[k][j];
+			}
+		}
+
+		return tmp;
+	}
+
+	bool Success()
+	{
+		return (matrix.size() == 0? false : true);
+	}
+
+	void Show(ostream &os)
+	{
+		int m = matrix.size();
+		int n = matrix[0].size();
+
+		for(int  i = 0; i < m ;i ++)
+		{
+			copy(matrix[i].begin(),matrix[i].end(),ostream_iterator <T>(os,"\t"));
+			cout << endl;
+		}
+	}
+};
+
+
+int main()
+{
+	string s = "1 2 3,4 5 6,7 8 9";
+	string s2 = "1 2 3 4 5 6 7,5 6 7 8 9 10 11,9 10 11 12 13 14 15";
+	MyMatrix<int> m1(s,3,3);
+	MyMatrix<int> m2(s2,3,7);
+
+	cout << "Matrix m1: " << endl;
+	m1.Show(cout);
+	cout << "Matrix m2: " << endl;
+	m2.Show(cout);
+
+	MyMatrix<int> m3 = m1.Multiply(m2);
+	cout << "m1 * m2 : " << endl;
+	if(m3.Success())
+	{
+		m3.Show(cout);
+	}
+	else
+	{
+		cout << "can't satisfy" << endl;
+	}
+
+	return 0;
+}
