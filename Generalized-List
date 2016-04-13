@@ -1,0 +1,288 @@
+#include <iostream>
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
+
+using namespace std;
+
+template <class T>
+struct GenListNode
+{
+private:
+    int uType;
+    GenListNode<T> *tlink;
+    union
+    {
+        int ref;
+        T value;
+        GenListNode<T> *hlink;
+    } info;
+public:
+    GenListNode():uType(0),tlink(NULL)
+    {
+        info.ref(0);
+    }
+    GenListNode(GenListNode<T>& RL )
+    {
+        uType=RL.uType;
+        info=RL.info;
+        tlink=RL.tlink;
+    }
+};
+
+template <class T>
+struct Items
+{
+    int uType;
+    union
+    {
+        int ref;
+        T value;
+        GenListNode<T>* hlink;
+    } info;
+    Items():uType(0)
+    {
+        info.ref(0);
+    }
+    Items(Items<T>&RL )
+    {
+        uType=RL.uType;
+        info=RL.info;
+    }
+};
+
+template <class T>
+class GenList
+{
+public:
+    GenList();
+    ~GenList();
+    bool Head(Items<T>& x);
+    GenListNode<T> *First();
+    GenListNode<T> *Next(GenListNode<T> * elem);
+    void Copy(const GenList<T>& R);
+    friend istream & operator >>(istream& in,GenList<T>& L);
+    int Length();
+    int Depth();
+private:
+    GenListNode<T> *first;
+    GenListNode<T> *Copy(GenListNode<T> *ls);
+    int Length(GenListNode<T> *ls);
+    int Depth(GenListNode<T> *ls);
+    bool equal(GenListNode<T> *s,GenListNode<T> *t)
+    {
+        int x;
+        if(s->tlink==NULL&&t->tlink==NULL) return true;
+        if(s->tlink!=NULL&&t->tlink!=NULL&&s->tlink->uType==t->tlink->uType)
+        {
+            if(s->tlink->uType==1)
+            {
+                x=(s->tlink->info.value==t->tlink->info.value)?1:0;
+            }
+            else if(s->tlink->uType==2)
+            {
+                x=equal(s->tlink->info.hlink,t->tlink->info.hlink);
+            }
+            if(x==1) return equal(s->tlink,t->tlink);
+        }
+        return false;
+    }
+    void Remove(GenListNode<T> *ls);
+    void Createlist(istream& in,GenListNode<T> *&ls);
+};
+
+template <class T>
+void GenList<T>::Createlist(istream in,GenListNode<T> *&ls,SeqList<T>& L1,SeqList<GenListNode<T>*> &L2)
+{
+    T chr;
+    in>>chr;
+    if(isalpha(chr)&&isupper(chr)||chr=='(')
+    {
+ls=new GenListNode<T>:
+        ls->uType=2;
+        if(isalpha(chr)&&isupper(chr))
+        {
+            int n=L1.Length();
+            int m=L1.Search();
+            if(m!=0)
+            {
+                GenListNode<T> *p=L2.Locate(m);
+                p->ref++;
+            }
+            else
+            {
+                L1.Insert(n,chr);
+                L2.Insert(n,ls);
+            }
+            in>>chr;
+            if(chr!='(') exit(1);
+        }
+        ls->info.hlink=new GenListNode<T>;
+        ls->info.hlink->uType=0;
+        ls->info.hlink->ref=1;
+        Createlist(in,ls->info.hlink->tlink,L1,L2)
+        Createlist(in,ls,L1,L2);
+    }
+    else if(isalpha(chr)&&islower(chr))
+    {
+        ls=new GenListNode<T>;
+        ls->info.value=chr;
+        Createlist(in,ls,L1,L2);
+    }
+    else if(chr==',')
+    {
+        Createlist(in,ls->tlink,L1,L2);
+        else if(chr==')')
+        {
+            ls->tlink=NULL;
+        }
+        else if(chr=='#')
+        {
+            ls=NULL;
+        }
+    }
+}
+template <class T>
+istream& operator>>(istream& in,GenList<T>& L)
+{
+    int n;
+    cout<<"total number:"<<endl;
+    in>>n;
+    T *Ls1=new T[n];
+    GenListNode<T> *LS2=new GenListNode<T>[n];
+    Createlist(in,L.first,LS1,LS2);
+    GenListNode<T>*p=L.first;
+    L.first=L.first->info.hlink;
+    delete[]Ls1;
+    delete[]LS2;
+    delete p;
+}
+
+template <class T>
+GenList<T>::GenList()
+{
+    first=new GenListNode<T>;
+    assert(first!=NULL);
+}
+
+template <class T>
+bool GenList<T>::Head(Items<T>& x)
+{
+    if(first->tlink==NULL) return false;
+    else
+    {
+        x.uType=first->tlink->uType;
+        x.info=first->tlink->info;
+        return true;
+    }
+}
+
+template<class T>
+GenListNode<T> *GenList<T>::First()
+{
+    if(first->tlink==NULL) return NULL;
+    else return first->tlink;
+}
+
+template <class T>
+void GenList<T>::Copy(const GenList<T>& R)
+{
+    first=Copy(R.first);
+}
+
+template <class T>
+GenListNode<T> * GenList<T>::Copy(GenListNode<T> *ls)
+{
+    GenListNode<T> *q=NULL;
+    if(ls!=NULL)
+    {
+        q=new GenListNode<T>;
+        q->uType=ls->uType;
+        switch(ls->uType)
+        {
+        case 0:
+            q->info.ref=ls->info.ref;
+            break;
+        case 1:
+            q->info.value=ls->info.value;
+            break;
+        case 2:
+            q->info->hlink=Copy(ls->info->hlink);
+            break;
+        }
+        q->tlink=Copy(ls->tlink);
+    }
+    return q;
+}
+
+template <class T>
+int GenList<T>::Length()
+{
+    return Length(first);
+}
+
+template<class T>
+int GenList<T>::Length(GenListNode<T> *ls)
+{
+    if(ls!=NULL) return 1+Length(ls->tlink);
+    else return 0;
+}
+
+template<class T>
+int GenList<T>::Depth()
+{
+    return Depth(first);
+}
+
+template <class T>
+int GenList<T>::Depth(GenListNode<T> *ls)
+{
+    if(ls->tlink==NULL) return 1;
+    GenListNode<T> *temp=ls->tlink;
+    int m=0;
+    int n;
+    while(temp!=NULL)
+    {
+        if(temp->uType==2)
+        {
+            n=Depth(temp->info.hlink);
+            if(m<n) m=n;
+        }
+        temp=temp->tlink;
+    }
+    return m+1;
+}
+
+template <class T>
+GenList<T>::~GenList()
+{
+    Remove(first);
+}
+
+template <class T>
+void GenList<T>::Remove(GenListNode<T> *ls)
+{
+    ls->info.ref--;
+    if(ls->info.ref<=0)
+    {
+        GenListNode<T> *q;
+        while(ls->tlink!=NULL)
+        {
+            q=ls->tlink;
+            if(q->uType==2)
+            {
+                Remove(q->info.hlink);
+                if(q->info.hlink->info.ref<=0)
+                    delete q->info.hlink;
+            }
+            ls->tlink=q->tlink;
+            delete q;
+        }
+    }
+}
+
+
+int main()
+{
+    
+}
