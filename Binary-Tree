@@ -1,0 +1,197 @@
+#include <iostream>
+
+using namespace std;
+
+struct BinTreeNode
+{
+    int data;
+    BinTreeNode *lc;
+    BinTreeNode *rc;
+};
+
+
+class BinTree
+{
+public:
+    static int n;
+    static int m;
+    BinTreeNode *root;
+    BinTree()
+    {
+        root=NULL;
+    }
+    void Creat_BinTree(int );
+    void PerOrder(BinTreeNode *p);
+    void InOrder(BinTreeNode *p);
+    void PostOrder(BinTreeNode *p);
+    void Display1()
+    {
+        PerOrder(root);
+        cout<<endl;
+    }
+    void Display2()
+    {
+        InOrder(root);
+        cout<<endl;
+    }
+    void Display3()
+    {
+        PostOrder(root);
+        cout<<endl;
+    }
+    int Count(BinTreeNode *p);       //sum
+    int FindLeaf(BinTreeNode *p);       //leaves
+    int  FindNode_1(BinTreeNode *p);   //度数为1的节点
+};
+
+int BinTree::m=0;
+int BinTree::n=0;
+
+void BinTree::Creat_BinTree(int x)
+{
+    BinTreeNode *newnode=new BinTreeNode;
+    newnode->data=x;
+    newnode->lc=NULL;
+    newnode->rc=NULL;
+    if(root==NULL)
+    {
+        root=newnode;
+    }
+    else
+    {
+        BinTreeNode *Back;
+        BinTreeNode *Current=root;
+        Back=Current;
+        while(Current!=NULL)
+        {
+            Back=Current;
+            if(Current->data>x)
+            {
+                Current=Current->lc;
+            }
+            else
+            {
+                Current=Current->rc;
+            }
+        }
+        if(Back->data>x)
+        {
+            Back->lc=newnode;
+        }
+        else
+        {
+            Back->rc=newnode;
+        }
+    }
+}
+
+int BinTree::Count(BinTreeNode *p)
+{
+    if(p==NULL)
+        return 0;
+    else
+        return Count(p->lc)+Count(p->rc)+1;
+}
+
+int BinTree::FindLeaf(BinTreeNode *p)
+{
+    if(p==NULL)
+        return 0;
+    else
+    {
+        if(p->lc==NULL&&p->rc==NULL)
+        {
+            return n+=1;
+        }
+        else
+        {
+            FindLeaf(p->lc);
+            FindLeaf(p->rc);
+        }
+        return n;
+    }
+}
+
+int BinTree::FindNode_1(BinTreeNode *p)
+{
+    if(p==NULL)
+        return 0;
+    else
+    {
+        if(p->lc!=NULL&&p->rc!=NULL)
+        {
+            FindNode_1(p->lc);
+            FindNode_1(p->rc);
+        }
+        if(p->lc!=NULL&&p->rc==NULL)
+        {
+            return m+=1;
+            FindNode_1(p->lc);
+        }
+        if(p->lc==NULL&&p->rc!=NULL)
+        {
+            return m+=1;
+            FindNode_1(p->rc);
+        }
+    }
+    return m;
+}
+
+void BinTree::PerOrder(BinTreeNode *p)
+{
+    if(p!=NULL)
+    {
+        cout<<p->data<<"  ";
+        PerOrder(p->lc);
+        PerOrder(p->rc);
+    }
+}
+
+void BinTree::InOrder(BinTreeNode *p)
+{
+    if(p!=NULL)
+    {
+        InOrder(p->lc);
+        cout<<p->data<<"  ";
+        InOrder(p->rc);
+    }
+}
+
+void BinTree::PostOrder(BinTreeNode *p)
+{
+    if(p!=NULL)
+    {
+        PostOrder(p->lc);
+        PostOrder(p->rc);
+        cout<<p->data<<"  ";
+    }
+}
+
+int main()
+{
+    BinTree A;
+    int Array[]= {7,4,2,3,15,35,6,45,55,20,1,14,56,57,58};
+    int k;
+    k=sizeof(Array)/sizeof(int);
+    cout<<"Creat_BinTree"<<endl;
+    for(int i=0; i<k; i++)
+    {
+        cout<<Array[i]<<"  ";
+        A.Creat_BinTree(Array[i]);
+    }
+
+   cout<<endl;
+
+    cout<<"Count： "<<A.Count(A.root)<<endl;
+
+    cout<<"CountLeaf："<<A.FindLeaf(A.root)<<endl;
+    cout<<"CountNode`Leaf=1："<<A.FindNode_1(A.root)<<endl;
+    cout<<endl<<"PerOrder: "<<endl;
+    A.Display1();
+    cout<<endl<<"InOrder: "<<endl;
+    A.Display2();
+    cout<<endl<<"PostOrder: "<<endl;
+    A.Display3();
+
+    return 0;
+}
