@@ -41,7 +41,7 @@ public:
     }
     int Count(BinTreeNode *p);       //sum
     int FindLeaf(BinTreeNode *p);       //leaves
-    int  FindNode_1(BinTreeNode *p);   //度数为1的节点
+    int  FindNode_1(BinTreeNode *p);   //Node`Leaf=1
 };
 
 int BinTree::m=0;
