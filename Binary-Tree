@@ -1,4 +1,5 @@
 #include <iostream>
+#include <queue>
 
 using namespace std;
 
@@ -41,7 +42,8 @@ public:
     }
     int Count(BinTreeNode *p);       //sum
     int FindLeaf(BinTreeNode *p);       //leaves
-    int  FindNode_1(BinTreeNode *p);   //Node`Leaf=1
+    int  FindNode_1(BinTreeNode *p);   //度数为1的节点
+    void LevelOrder();
 };
 
 int BinTree::m=0;
@@ -167,6 +169,27 @@ void BinTree::PostOrder(BinTreeNode *p)
     }
 }
 
+void BinTree::LevelOrder()
+{
+    queue<BinTreeNode *> Q;
+    BinTreeNode *p=root;
+    Q.push(p);
+    while(!Q.empty())
+    {
+        cout<<Q.front()->data<<"  ";
+        p= Q.front();
+        Q.pop();
+        if(p->lc!=NULL)
+        {
+            Q.push(p->lc);
+        }
+        if(p->rc!=NULL)
+        {
+            Q.push(p->rc);
+        }
+    }
+}
+
 int main()
 {
     BinTree A;
@@ -180,7 +203,7 @@ int main()
         A.Creat_BinTree(Array[i]);
     }
 
-   cout<<endl;
+    cout<<endl;
 
     cout<<"Count： "<<A.Count(A.root)<<endl;
 
@@ -192,6 +215,7 @@ int main()
     A.Display2();
     cout<<endl<<"PostOrder: "<<endl;
     A.Display3();
-
+    cout<<endl<<"LevelOrder: "<<endl;
+    A.LevelOrder();
     return 0;
 }
